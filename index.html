@@ -190,7 +190,7 @@ function render(){
       for(const [d,ad] of Object.entries(by(arr,s=>s.date))){h+=`<h4>${dl(d)}</h4>`;const bt=by(ad,s=>s.title+"\u0000"+s.fmt);
         for(const kk of Object.keys(bt).sort((a,b)=>bt[a][0].min-bt[b][0].min)){const [t,f]=kk.split("\u0000");h+=`<div class="row"><div>${tn(t)}${fmtTag(f)}${gTag(t)}</div>${chips(bt[kk])}</div>`;}}
       h+=`</div>`;}}
-  out.innerHTML=h+`<div class="note" style="margin-top:8px">* は翌日深夜の回（例：24:00 → 00:00*）。時刻は開始–終了（終了は本編込みの館発表値）。</div>`;
+  out.innerHTML=h+`<div class="note" style="margin-top:8px">* は翌日深夜の回（例：24:00 → 00:00*）。時刻は開始–終了（終了は本編込みの館発表値）。<br>ジャンルは TMDB のデータをもとに自動判定しています（This product uses the TMDB API but is not endorsed or certified by TMDB.）。</div>`;
 }
 function init(D){
   build(D);
