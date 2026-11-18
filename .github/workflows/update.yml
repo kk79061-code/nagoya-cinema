@@ -33,12 +33,14 @@ jobs:
 
       - name: 4館の公式サイトから取得
         run: node scrape.mjs
+        env:
+          TMDB_TOKEN: ${{ secrets.TMDB_TOKEN }}
 
       - name: data.json をリポジトリに保存
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add data.json
+          git add data.json genre-cache.json
           git diff --cached --quiet || git commit -m "上映スケジュール更新 $(TZ=Asia/Tokyo date '+%Y-%m-%d %H:%M')"
           git push
 
