@@ -135,8 +135,92 @@ for (const [id, fn] of Object.entries(jobs)) {
     console.error(`${id}: 取得失敗 → 前回データを使用 (${e.message})`);
   }
 }
+// ---------- ジャンル判定（TMDB + 手動の genre.txt） ----------
+// 作品名から形式表記（字幕・IMAX・舞台挨拶など）を外して作品の本体名にする（index.html と同じ処理）
+const FW = /字幕|吹替|IMAX|Dolby|ドルビー|SCREENX|4DX|轟音|4K|最速|舞台挨拶|赤ちゃん|応援|発声|ODS|SAION|ライブビューイング|リマスター|レストア|^DC/i;
+function baseTitle(raw) {
+  let s = raw.normalize("NFKC").replace(/\s+/g, " ").trim();
+  s = s.replace(/【(PG|R)-?\d+\+?指定】/g, "");
+  s = s.replace(/\[([^\]]*)(\]|$)/g, (m, x) => FW.test(x) ? "" : m);
+  s = s.replace(/【([^】]*)】/g, (m, x) => FW.test(x) ? "" : m);
+  s = s.replace(/\(([^)]*)(\)|$)/g, (m, x) => FW.test(x) ? "" : m);
+  s = s.replace(/^(字幕|吹替)\s+/, "");
+  s = s.replace(/^舞台挨拶中継付き\)\s*/, "");
+  s = s.replace(/(公開記念)?舞台挨拶.*$/, (m, a, off) => off > 0 ? "" : m);
+  let m;
+  if (m = s.match(/^劇場アニメーション[「『](.+?)[」』]\s*(.*)$/)) s = m[1];
+  else if ((m = s.match(/^(.*?)『(.+?)』(.*)$/)) && (m[1].trim() === "" || /劇場版|上映$/.test(m[1].trim()))) s = m[2];
+  s = s.replace(/\s4K(リマスター|レストア)?(?=\s|\(|$)/, "");
+  return s.trim().replace(/(…|\.\.\.)$/, "").trim();
+}
+const keyOf = s => s.normalize("NFKC").toLowerCase().replace(/^(映画|劇場版)\s*/, "").replace(/[^\p{L}\p{N}]/gu, "");
+
+// 映画ではないもの（ライブ・スポーツ・舞台など）は名前で判定
+const OTHER = /WORLD TOUR|\bLIVE\b|ライヴ|ライブ|コンサート|歌舞伎|METライブ|ナショナル・シアター|ビューイング|サッカー|ワールドカップ|CHEERING|ANIAFF|カンファレンス/i;
+
+// TMDB 検索用に作品名を整える
+function queries(base) {
+  const q = base.replace(/^(映画|劇場版|劇場先行版|劇場シリーズ|劇場アニメーション)\s*/, "")
+    .replace(/【[^】]*】|「|」|『|』|\([^)]*\)/g, " ").replace(/\s+/g, " ").trim();
+  const list = [q];
+  const short = q.split(/[\s/:：~～\-ー―]/)[0];               // 副題を落とした短い名前
+  if (short && short.length >= 2 && short !== q) list.push(short);
+  return list;
+}
+
+async function tmdbGenre(base) {
+  const token = process.env.TMDB_TOKEN;
+  if (!token) return null;
+  const want = keyOf(base);
+  for (const q of queries(base)) {
+    const url = `https://api.themoviedb.org/3/search/movie?query=${encodeURIComponent(q)}&language=ja-JP&include_adult=false`;
+    const r = await fetch(url, { headers: { Authorization: `Bearer ${token}`, accept: "application/json" } });
+    if (!r.ok) throw new Error(`TMDB ${r.status}`);
+    const res = (await r.json()).results || [];
+    if (!res.length) continue;
+    // 題名がいちばん近いもの → なければ人気順の先頭
+    const hit = res.find(x => keyOf(x.title || "") === want || keyOf(x.original_title || "") === want)
+      || res.find(x => want.startsWith(keyOf(x.title || "")) && keyOf(x.title || "").length >= 2)
+      || res[0];
+    const g = (hit.genre_ids || []).includes(16) ? "アニメ"      // 16 = Animation
+      : hit.original_language === "ja" ? "邦画" : "洋画";
+    return { g, tmdb: hit.id, title: hit.title, q };
+  }
+  return null;
+}
+
+const CACHE_FILE = "genre-cache.json";
+const cache = fs.existsSync(CACHE_FILE) ? JSON.parse(fs.readFileSync(CACHE_FILE, "utf8")) : {};
+const manualText = fs.existsSync("genre.txt") ? fs.readFileSync("genre.txt", "utf8") : "";
+const manual = new Set(manualText.split("\n").map(l => keyOf(baseTitle(l.trim()))).filter(Boolean));
+const todayStr = days[0];
+const weekAgo = new Date(Date.now() + 9 * 3600e3 - 7 * 86400e3).toISOString().slice(0, 10).replace(/-/g, "");
+const bases = new Map();
+for (const t of Object.values(theaters)) for (const raw of t.T) { const b = baseTitle(raw); if (b) bases.set(keyOf(b), b); }
+let looked = 0;
+for (const [k, b] of bases) {
+  if (!k || manual.has(k)) continue;                                // 手動指定があればそちらを使う
+  const c = cache[k];
+  if (c && (c.g || (c.checked && c.checked > weekAgo))) continue; // 判定済み／見つからなかったものは7日後に再検索
+  let entry;
+  if (OTHER.test(b)) entry = { g: "その他", by: "name" };
+  else {
+    try { const r = await tmdbGenre(b); entry = r ? { ...r, by: "tmdb" } : { g: null }; looked++; }
+    catch (e) { console.error(`TMDB検索失敗: ${b} (${e.message})`); continue; }
+  }
+  cache[k] = { name: b, ...entry, checked: todayStr };
+  console.log(`ジャンル: ${b} → ${entry.g || "不明"}${entry.title ? `（TMDB: ${entry.title}）` : ""}`);
+}
+fs.writeFileSync(CACHE_FILE, JSON.stringify(cache, null, 1));
+if (!process.env.TMDB_TOKEN) console.warn("TMDB_TOKEN が未設定のため、TMDB でのジャンル判定は行いませんでした");
+else console.log(`TMDB 検索: ${looked} 件`);
+
+// 自動判定 → 手動（genre.txt）の順に並べる。ページ側は後に書いたものを優先する
+const auto = { "アニメ": [], "邦画": [], "洋画": [], "その他": [] };
+for (const c of Object.values(cache)) if (c.g && auto[c.g]) auto[c.g].push(c.name);
+const genre = Object.entries(auto).map(([g, l]) => [g, ...l].join("\n")).join("\n") + "\n" + manualText;
+
 const now = new Date(Date.now() + 9 * 3600e3).toISOString().slice(0, 16).replace("T", " ");
-const genre = fs.existsSync("genre.txt") ? fs.readFileSync("genre.txt", "utf8") : "";
 fs.writeFileSync("data.json", JSON.stringify({ updated: now, days, theaters, status, genre }));
 console.log(`data.json を書き出しました (${now} JST, ${days[0]}〜${days.at(-1)})`);
 if (Object.values(status).every(s => s === "failed")) process.exit(1);
