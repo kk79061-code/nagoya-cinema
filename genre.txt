@@ -1,217 +1,76 @@
-<!DOCTYPE html>
-<html lang="ja">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>名古屋 映画館 上映スケジュール</title>
-<style>
-:root{--bg:#f6f5f2;--card:#fff;--ink:#1d1d1f;--sub:#6b6b70;--line:#e3e1dc;--acc:#c2410c;}
-@media (prefers-color-scheme:dark){:root{--bg:#141416;--card:#1e1e21;--ink:#ececee;--sub:#9a9aa1;--line:#333338;--acc:#fb923c;}}
-*{box-sizing:border-box}
-body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Noto Sans JP",sans-serif;background:var(--bg);color:var(--ink);font-size:14px}
-header{padding:16px 20px 8px}
-h1{font-size:19px;margin:0 0 4px}
-.note{color:var(--sub);font-size:12px;line-height:1.55}
-.note a{color:var(--sub)}
-.wrap{display:grid;grid-template-columns:300px 1fr;gap:16px;padding:8px 20px 40px}
-@media(max-width:800px){.wrap{grid-template-columns:1fr}}
-aside,.panel{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px}
-aside{align-self:start;position:sticky;top:10px;max-height:calc(100vh - 20px);overflow:auto}
-@media(max-width:800px){aside{position:static;max-height:none}}
-aside h3{font-size:13px;margin:14px 0 6px;color:var(--sub);display:flex;justify-content:space-between;align-items:center}
-aside h3:first-child{margin-top:0}
-label.ck{display:flex;gap:6px;align-items:flex-start;padding:3px 0;cursor:pointer;line-height:1.35}
-label.ck input{margin-top:2px}
-label.ck .n{color:var(--sub);font-size:11px;margin-left:auto;white-space:nowrap}
-.mini{font-size:11px;border:1px solid var(--line);background:transparent;color:var(--ink);border-radius:5px;padding:2px 6px;cursor:pointer;margin-left:4px}
-input[type=search],select{padding:6px 8px;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--ink)}
-input[type=search]{width:100%;margin-bottom:6px}
-.tabs{display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap}
-.tab{border:1px solid var(--line);background:var(--card);color:var(--ink);padding:7px 14px;border-radius:20px;cursor:pointer;font-size:13px}
-.tab.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
-.count{color:var(--sub);font-size:12px;margin-bottom:8px}
-.grp{margin-bottom:18px}
-.grp>h2{font-size:15px;margin:0 0 6px;padding-bottom:4px;border-bottom:2px solid var(--line)}
-.grp h4{font-size:13px;margin:10px 0 4px;color:var(--sub)}
-table{width:100%;border-collapse:collapse}
-td{padding:5px 6px;border-bottom:1px solid var(--line);vertical-align:top}
-td.t{font-variant-numeric:tabular-nums;white-space:nowrap;width:1%}
-td.t b{font-size:14px}
-td.t span{color:var(--sub);font-size:11.5px}
-.th{display:inline-block;font-size:11px;padding:1px 7px;border-radius:10px;color:#fff;white-space:nowrap}
-.scr{color:var(--sub);font-size:11px;margin-left:4px;white-space:nowrap}
-.fmt{display:inline-block;font-size:10.5px;padding:0 5px;border:1px solid var(--acc);color:var(--acc);border-radius:4px;margin-left:4px;white-space:nowrap}
-.chips{display:flex;flex-wrap:wrap;gap:4px}
-.chip{font-variant-numeric:tabular-nums;font-size:12.5px;padding:2px 7px;border:1px solid var(--line);border-radius:5px}
-.chip span{color:var(--sub);font-size:11px}
-.late{color:var(--acc)}
-.row{display:grid;grid-template-columns:170px 1fr;gap:8px;padding:5px 0;border-bottom:1px solid var(--line)}
-@media(max-width:600px){.row{grid-template-columns:1fr}}
-.empty{color:var(--sub);padding:30px;text-align:center}
-.dot{width:9px;height:9px;border-radius:50%;display:inline-block;margin-right:2px;flex:none;margin-top:4px}
-</style>
-</head>
-<body>
-<header>
-<h1>名古屋 4館 上映スケジュール</h1>
-<div class="note" id="src"></div>
-</header>
-<div class="wrap">
-<aside>
-<h3>日付</h3><div id="fDate"></div>
-<h3>ジャンル</h3><div id="fGenre"></div>
-<h3>劇場</h3><div id="fTheater"></div>
-<h3>開始時刻</h3>
-<div style="display:flex;gap:6px;align-items:center"><select id="tFrom"></select>〜<select id="tTo"></select></div>
-<h3>作品 <span><button class="mini" id="allOn">全選択</button><button class="mini" id="allOff">全解除</button></span></h3>
-<input type="search" id="q" placeholder="作品名で絞り込み">
-<div id="fTitle"></div>
-</aside>
-<main>
-<div class="tabs" id="tabs"></div>
-<div class="count" id="count"></div>
-<div id="out"><div class="panel empty">読み込み中…</div></div>
-</main>
-</div>
-<script>
-const THEATERS=[
- {id:"109",name:"109シネマズ名古屋",short:"109名古屋",c:"#2563eb",url:"https://109cinemas.net/nagoya/"},
- {id:"toho",name:"TOHOシネマズ名古屋栄",short:"TOHO栄",c:"#db2777",url:"https://hlo.tohotheater.jp/net/schedule/091/TNPI2000J01.do"},
- {id:"msc",name:"ミッドランドスクエアシネマ（1・2）",short:"ミッドランド",c:"#16a34a",url:"https://ticket.midlandcinema.jp/schedule/ticket/0201/index.html"},
- {id:"aeon",name:"イオンシネマワンダー",short:"ワンダー",c:"#9333ea",url:"https://theater.aeoncinema.com/theaters/wonder/"}
-];
-const GENRES=["アニメ","邦画","洋画","その他","未分類"];
-const GCOL={"アニメ":"#0891b2","邦画":"#b45309","洋画":"#4f46e5","その他":"#64748b","未分類":"#9ca3af"};
-const WD="日月火水木金土";
-const $=id=>document.getElementById(id);
-
-/* ---------- 作品名の正規化（館ごとの表記ゆれ・形式表記・途中省略をまとめる） ---------- */
-const FW=/字幕|吹替|IMAX|Dolby|ドルビー|SCREENX|4DX|轟音|4K|最速|舞台挨拶|赤ちゃん|応援|発声|ODS|SAION|ライブビューイング|リマスター|レストア|^DC/i;
-function fmtName(x){x=x.trim();
-  if(/日本語字幕/.test(x))return"日本語字幕";if(/字幕/.test(x))return"字幕";if(/吹替/.test(x))return"吹替";
-  if(/IMAX/i.test(x))return"IMAX";if(/Dolby|ドルビー|^DC/i.test(x))return"Dolby";if(/SCREENX/i.test(x))return"ScreenX";
-  if(/4DX/i.test(x))return"4DX";if(/轟音/.test(x))return"轟音";if(/4K|リマスター|レストア/i.test(x))return"4K";
-  if(/舞台挨拶|ライブビューイング/.test(x))return"舞台挨拶中継";if(/応援|発声/.test(x))return"応援上映";
-  if(/最速/.test(x))return"最速上映";if(/赤ちゃん/.test(x))return"赤ちゃん連れ";if(/^ODS$/i.test(x))return"";return x;}
-function parseTitle(raw){
-  let s=raw.normalize("NFKC").replace(/\s+/g," ").trim();const f=new Set();const add=x=>{x.split("・").forEach(y=>{const n=fmtName(y);if(n)f.add(n);});};
-  s=s.replace(/【(PG|R)-?\d+\+?指定】/g,"");
-  s=s.replace(/\[([^\]]*)(\]|$)/g,(m,x)=>FW.test(x)?(add(x),""):m);
-  s=s.replace(/【([^】]*)】/g,(m,x)=>FW.test(x)?(add(x),""):m);
-  s=s.replace(/\(([^)]*)(\)|$)/g,(m,x)=>FW.test(x)?(add(x),""):m);
-  s=s.replace(/^(字幕|吹替)\s+/,(m,x)=>(add(x),""));
-  s=s.replace(/^舞台挨拶中継付き\)\s*/,()=>(add("舞台挨拶"),""));
-  s=s.replace(/(公開記念)?舞台挨拶.*$/,(m,a,off)=>off>0?(add("舞台挨拶"),""):m);
-  let m;
-  if(m=s.match(/^劇場アニメーション[「『](.+?)[」』]\s*(.*)$/)){s=m[1];if(m[2])add(m[2].replace(/(…|\.\.\.)$/,"").split(" ")[0]);}
-  else if((m=s.match(/^(.*?)『(.+?)』(.*)$/))&&(m[1].trim()===""||/劇場版|上映$/.test(m[1].trim())))s=m[2];
-  s=s.replace(/\s4K(リマスター|レストア)?(?=\s|\(|$)/,()=>(add("4K"),""));
-  s=s.trim();const trunc=/(…|\.\.\.)$/.test(s);s=s.replace(/(…|\.\.\.)$/,"").trim();
-  return{base:s,fmt:[...f].join("・"),trunc};
-}
-const keyOf=s=>s.normalize("NFKC").toLowerCase().replace(/^(映画|劇場版)\s*/,"").replace(/[^\p{L}\p{N}]/gu,"");
-
-let SHOWS=[],TITLES=[],TNAME={},GMAP={},DAYS=[];
-function build(D){
-  DAYS=D.days.map(d=>({k:d,l:`${+d.slice(4,6)}/${+d.slice(6)}(${WD[new Date(+d.slice(0,4),+d.slice(4,6)-1,+d.slice(6)).getDay()]})`}));
-  const parsed={};const raw=[];
-  for(const th of THEATERS){const t=D.theaters[th.id];if(!t)continue;
-    const P=t.T.map(x=>{if(!parsed[x]){const p=parseTitle(x);p.key=keyOf(p.base);parsed[x]=p;}return parsed[x];});
-    for(const r of t.R.split(";")){if(!r)continue;const [d,s,e,ti,sc]=r.split(",");const p=P[+ti];if(!p||!p.key)continue;
-      const toMin=x=>+x.slice(0,2)*60+ +x.slice(2);raw.push({th:th.id,date:d,min:toMin(s),end:e?toMin(e):null,p,scr:sc==="Sc5"?"Dolby":sc});}}
-  // 途中で切れた作品名を、続きのある正式名にまとめる
-  const all=Object.values(parsed);const full=[...new Set(all.filter(p=>!p.trunc).map(p=>p.key))];const canon={};
-  for(const p of all){let k=p.key;if(p.trunc||k.length>=8){const c=full.filter(K=>K!==k&&K.startsWith(k));if(c.length===1)k=c[0];}canon[p.key]=k;}
-  const names={};for(const p of all){const k=canon[p.key];const cur=names[k];const cand=p.trunc?p.base+"…":p.base;
-    if(!cur||(cur.endsWith("…")&&!p.trunc)||(!p.trunc&&!cur.endsWith("…")&&p.key===k&&cand.length>cur.length))names[k]=cand;}
-  TNAME=names;
-  SHOWS=raw.map(x=>({th:x.th,date:x.date,min:x.min,end:x.end,title:canon[x.p.key],fmt:x.p.fmt,scr:x.scr}));
-  // ジャンル
-  GMAP={};let g=null;for(const l of (D.genre||"").split("\n")){const t=l.trim();if(!t)continue;if(GENRES.includes(t)){g=t;continue;}if(g){const k=keyOf(parseTitle(t).base);if(k)GMAP[k]=g;}}
-  const cnt={};SHOWS.forEach(s=>cnt[s.title]=(cnt[s.title]||0)+1);
-  TITLES=Object.keys(cnt).sort((a,b)=>cnt[b]-cnt[a]);
-}
-const GCACHE={};
-function genreOf(k){if(GCACHE[k])return GCACHE[k];let g=GMAP[k];
-  if(!g){const c=Object.keys(GMAP).filter(K=>K.length>=4&&(k.startsWith(K)||K.startsWith(k)));if(c.length)g=GMAP[c.sort((a,b)=>b.length-a.length)[0]];}
-  if(!g)g=SHOWS.some(s=>s.title===k&&/(^|・)字幕/.test(s.fmt))?"洋画":"未分類";return GCACHE[k]=g;}
-const tn=k=>TNAME[k]||k;
-
-/* ---------- 表示 ---------- */
-const thOf=id=>THEATERS.find(t=>t.id===id);
-const hm=m=>{const late=m>=1440;const x=late?m-1440:m;const s=`${String(Math.floor(x/60)).padStart(2,"0")}:${String(x%60).padStart(2,"0")}`;return late?`<span class="late" title="翌日深夜">${s}*</span>`:s;};
-const span=s=>`<b>${hm(s.min)}</b>${s.end!=null?`<span>–${hm(s.end)}</span>`:""}`;
-const thTag=id=>{const t=thOf(id);return `<span class="th" style="background:${t.c}">${t.short}</span>`;};
-const scrTag=s=>s.scr?`<span class="scr">${/^\d+$/.test(s.scr)?"スクリーン"+s.scr:s.scr}</span>`:"";
-const fmtTag=f=>f?f.split("・").map(x=>`<span class="fmt">${x}</span>`).join(""):"";
-const gTag=k=>{const g=genreOf(k);return `<span class="fmt" style="border-color:${GCOL[g]};color:${GCOL[g]}">${g}</span>`;};
-const by=(arr,f)=>arr.reduce((m,x)=>{const k=f(x);(m[k]=m[k]||[]).push(x);return m;},{});
-const dl=k=>(DAYS.find(d=>d.k===k)||{l:k}).l;
-const BANDS=[["朝（〜11時）",0,11],["昼（11〜15時）",11,15],["夕方（15〜18時）",15,18],["夜（18〜21時）",18,21],["レイト（21時〜）",21,99]];
-const VIEWS=[["date","日時別"],["title","タイトル別"],["genre","ジャンル別"],["time","時間帯別"],["theater","劇場別"]];
-let st;
-function ck(container,items,set,onchg){container.innerHTML="";
-  for(const it of items){const l=document.createElement("label");l.className="ck";
-    l.innerHTML=`<input type="checkbox" ${set.has(it.k)?"checked":""}>${it.dot?`<span class="dot" style="background:${it.dot}"></span>`:""}<span>${it.l}</span>${it.n!=null?`<span class="n">${it.n}回</span>`:""}`;
-    l.querySelector("input").onchange=e=>{e.target.checked?set.add(it.k):set.delete(it.k);onchg&&onchg();render();};container.appendChild(l);}}
-function saveTitles(){try{localStorage.setItem("nagoyaCinemaOff2",JSON.stringify(TITLES.filter(t=>!st.titles.has(t))));}catch(e){}}
-function drawTitles(){const q=st.q.trim().toLowerCase();const box=$("fTitle");box.innerHTML="";
-  for(const g of GENRES){if(!st.genres.has(g))continue;
-    const ts=TITLES.filter(t=>genreOf(t)===g&&(!q||tn(t).toLowerCase().includes(q)));if(!ts.length)continue;
-    const hd=document.createElement("div");hd.style.cssText="font-size:11px;font-weight:600;margin:8px 0 2px;color:"+GCOL[g];
-    hd.innerHTML=g+` <button class="mini" data-a="on">全</button><button class="mini" data-a="off">解</button>`;
-    hd.querySelectorAll("button").forEach(b=>b.onclick=()=>{ts.forEach(t=>b.dataset.a==="on"?st.titles.add(t):st.titles.delete(t));saveTitles();drawTitles();render();});
-    box.appendChild(hd);const d=document.createElement("div");box.appendChild(d);
-    ck(d,ts.map(t=>({k:t,l:tn(t),n:SHOWS.filter(s=>s.title===t&&st.dates.has(s.date)&&st.ths.has(s.th)).length})),st.titles,saveTitles);}}
-let lastKey="";
-function render(){
-  const k=[...st.dates,...st.ths,...st.genres].join();if(k!==lastKey){lastKey=k;drawTitles();}
-  document.querySelectorAll(".tab").forEach(b=>b.classList.toggle("on",b.dataset.v===st.view));
-  const list=SHOWS.filter(s=>st.dates.has(s.date)&&st.ths.has(s.th)&&st.titles.has(s.title)&&st.genres.has(genreOf(s.title))&&s.min>=st.from*60&&s.min<st.to*60)
-    .sort((a,b)=>a.date.localeCompare(b.date)||a.min-b.min||a.th.localeCompare(b.th));
-  $("count").textContent=`${list.length} 回の上映 ／ ${new Set(list.map(s=>s.title)).size} 作品`;
-  const out=$("out");if(!list.length){out.innerHTML=`<div class="panel empty">条件に合う上映はありません</div>`;return;}
-  let h="";
-  const rowsTable=arr=>`<table>${arr.map(s=>`<tr><td class="t">${span(s)}</td><td>${tn(s.title)}${fmtTag(s.fmt)}${gTag(s.title)}</td><td style="text-align:right;white-space:nowrap">${thTag(s.th)}${scrTag(s)}</td></tr>`).join("")}</table>`;
-  const chips=arr=>`<div class="chips">${arr.map(s=>`<span class="chip">${span(s)}</span>`).join("")}</div>`;
-  if(st.view==="date"){for(const [d,arr] of Object.entries(by(list,s=>s.date)))h+=`<div class="panel grp"><h2>${dl(d)}</h2>${rowsTable(arr)}</div>`;}
-  else if(st.view==="time"){for(const [d,arr] of Object.entries(by(list,s=>s.date))){h+=`<div class="panel grp"><h2>${dl(d)}</h2>`;
-      for(const [bl,lo,hi] of BANDS){const a=arr.filter(s=>s.min>=lo*60&&s.min<hi*60);if(a.length)h+=`<h4>${bl}　${a.length}回</h4>${rowsTable(a)}`;}h+=`</div>`;}}
-  else if(st.view==="title"||st.view==="genre"){const g=by(list,s=>s.title);
-    const order=st.view==="genre"?GENRES.flatMap(gn=>TITLES.filter(t=>genreOf(t)===gn)):TITLES;let curG="";
-    for(const t of order){const arr=g[t];if(!arr)continue;
-      if(st.view==="genre"&&genreOf(t)!==curG){curG=genreOf(t);h+=`<h2 style="margin:18px 0 8px;color:${GCOL[curG]}">■ ${curG}</h2>`;}
-      h+=`<div class="panel grp"><h2>${tn(t)} ${st.view==="title"?gTag(t):""} <span class="note">${arr.length}回</span></h2>`;
-      for(const [d,ad] of Object.entries(by(arr,s=>s.date))){h+=`<h4>${dl(d)}</h4>`;
-        for(const [kk,at] of Object.entries(by(ad,s=>s.th+"\u0000"+s.fmt))){const [tid,f]=kk.split("\u0000");h+=`<div class="row"><div>${thTag(tid)}${fmtTag(f)}</div>${chips(at)}</div>`;}}
-      h+=`</div>`;}}
-  else{const g=by(list,s=>s.th);
-    for(const th of THEATERS){const arr=g[th.id];if(!arr)continue;h+=`<div class="panel grp"><h2>${thTag(th.id)} ${th.name}</h2>`;
-      for(const [d,ad] of Object.entries(by(arr,s=>s.date))){h+=`<h4>${dl(d)}</h4>`;const bt=by(ad,s=>s.title+"\u0000"+s.fmt);
-        for(const kk of Object.keys(bt).sort((a,b)=>bt[a][0].min-bt[b][0].min)){const [t,f]=kk.split("\u0000");h+=`<div class="row"><div>${tn(t)}${fmtTag(f)}${gTag(t)}</div>${chips(bt[kk])}</div>`;}}
-      h+=`</div>`;}}
-  out.innerHTML=h+`<div class="note" style="margin-top:8px">* は翌日深夜の回（例：24:00 → 00:00*）。時刻は開始–終了（終了は本編込みの館発表値）。</div>`;
-}
-function init(D){
-  build(D);
-  const failed=THEATERS.filter(t=>D.status&&D.status[t.id]==="failed").map(t=>t.name);
-  $("src").innerHTML=`各館の公式サイトから取得（${D.updated} 時点）：`+THEATERS.map(t=>`<a href="${t.url}" target="_blank" rel="noopener">${t.name}</a>`).join(" / ")+`<br>座席状況・最新の変更は公式サイトで確認してください。`+(failed.length?`<br><span class="late">※ ${failed.join("、")} は今回の取得に失敗したため、前回取得分を表示しています。</span>`:"");
-  st={view:"date",dates:new Set(DAYS.map(d=>d.k)),ths:new Set(THEATERS.map(t=>t.id)),titles:new Set(TITLES),genres:new Set(GENRES),from:7,to:27,q:""};
-  try{JSON.parse(localStorage.getItem("nagoyaCinemaOff2")||"[]").forEach(t=>st.titles.delete(t));}catch(e){}
-  ck($("fDate"),DAYS,st.dates);
-  ck($("fGenre"),GENRES.filter(g=>TITLES.some(t=>genreOf(t)===g)).map(g=>({k:g,l:g,dot:GCOL[g]})),st.genres);
-  ck($("fTheater"),THEATERS.map(t=>({k:t.id,l:t.name,dot:t.c})),st.ths);
-  for(const sel of ["tFrom","tTo"])for(let h=7;h<=27;h++){const o=document.createElement("option");o.value=h;o.textContent=h<27?`${h}時`:"最後まで";$(sel).appendChild(o);}
-  $("tFrom").value=7;$("tTo").value=27;
-  $("tFrom").onchange=e=>{st.from=+e.target.value;render();};$("tTo").onchange=e=>{st.to=+e.target.value;render();};
-  $("q").oninput=e=>{st.q=e.target.value;drawTitles();};
-  $("allOn").onclick=()=>{TITLES.forEach(t=>st.titles.add(t));saveTitles();drawTitles();render();};
-  $("allOff").onclick=()=>{st.titles.clear();saveTitles();drawTitles();render();};
-  $("tabs").innerHTML=VIEWS.map(([k,l])=>`<button class="tab" data-v="${k}">${l}</button>`).join("");
-  $("tabs").onclick=e=>{const v=e.target.dataset.v;if(v){st.view=v;render();}};
-  render();
-}
-fetch("data.json",{cache:"no-store"}).then(r=>r.json()).then(init).catch(e=>{$("out").innerHTML=`<div class="panel empty">データを読み込めませんでした（${e.message}）</div>`;});
-</script>
-</body>
-</html>
+アニメ
+映画ちいかわ 人魚の島のひみつ
+楽園追放 心のレゾナンス
+ガールズ＆パンツァー 最終章 第5話
+GROTESQQQUE -グロテスク-
+メイドインアビス 目覚める神秘
+劇場シリーズ【第一部】メイドインアビス 目覚める神秘
+青春ブタ野郎はディアフレンドの夢を見ない
+映画「BanG Dream! Ave Mujica prima aurora」
+BanG Dream! Ave Mujica prima aurora
+劇場版 進撃の巨人 前編～紅蓮の弓矢
+劇場先行版「風を継ぐもの -はじまり-」
+音楽 ブラシュアップ版 SAION Anime Sound
+犬王
+COWBOY BEBOP 天国の扉
+魔法使いの夜
+我々は宇宙人
+映画名探偵プリキュア！ 不思議な庭と2人の秘密
+ヤマトよ永遠に REBEL3199 第七章 虹色の輪廻
+映画 ひつじのショーン かぼちゃ畑の怪物！
+劇場版 前橋ウィッチーズ ～魔女見習いのエモエモリーズ～
+超かぐや姫!
+装甲騎兵ボトムズ 灰色の魔女(ヘクセ) 第1作
+劇場版 アイドルマスター SideM F@NTASTIC BATTLE FES Who goes first
+遊☆戯☆王 THE DARK SIDE OF DIMENSIONS リバイバル
+「文豪ストレイドッグス」「探偵社設立秘話」
+ANIAFF:国際長編コンペティション グランプリ作品
+ラブル＆クルー IN シアター 2026
+邦画
+ゴジラ-0.0
+踊る大捜査線 N.E.W. メトロポリスを駆け抜けろ！
+ママがもうこの世界にいなくても 私の命の日記
+汝、星のごとく
+バッド・ルーテナント：トウキョウ
+うるわしの宵の月
+負けへんで
+RYUJI 竜二
+mentor
+4アウト ─もう一度、プレイボール─
+すべて真夜中の恋人たち
+呪いのスマホ
+男ともだち
+星の教室
+3ミリの恋
+わたしの知らない子どもたち
+影の車
+南極料理人
+Vシネクスト「仮面ライダーカブト20th 天を継ぐもの」
+洋画
+バイオハザード
+ストリートファイター／ザ・ムービー
+ヴェリティ／真実
+クリスマス・キャロル／3人のゴーストたち
+DIGGER／ディガー
+クレイフェイス
+トキシック・アベンジャー
+Michael／マイケル
+スパイダーマン：ブランド・ニュー・デイ
+ラブ・アクチュアリー 4K(午前十時の映画祭16)
+ブリジット・ジョーンズの日記
+55 FIFTY FIVE 番号で呼ばれた少年
+大富豪になるための正しい殺し方
+1971、ハイジャック事件
+ハンナ・モンタナ/ザ・ムービー
+アザー・マミー
+ファーザー マザー シスター ブラザー
+ジャイアント
+その他
+ENHYPEN WORLD TOUR 'BLOOD SAGA'
+HYBE CHEERING PARTY
+BTS WORLD TOUR 'ARIRANG' IN KAOHSIUNG
+月イチ歌舞伎 沓手鳥孤城落月/楊貴妃
+METライブビューイング2026-27 モーツァルト《コジ・ファン・トゥッテ》
+Creepy Nuts - NORTH AMERICA TOUR: LIVE in NY & DOCUMENTARY FILM
+サッカー日本代表 FIFAワールドカップ2026 「最高の景色」への挑戦 ONE CREATURE 2nd Leg
+Rammsteinライヴ・フィルム『Live in Mexico City』炎上上映
