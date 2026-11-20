@@ -154,5 +154,33 @@
   "q": "東京ドーム公演記念 乗車準備会 僕たちは、超特急です!!!!!!!!!",
   "by": "tmdb",
   "checked": "20261120"
+ },
+ "btsworldtourarirangin": {
+  "name": "BTS WORLD TOUR ARIRANG IN",
+  "g": "その他",
+  "by": "name",
+  "checked": "20261120"
+ },
+ "1122larcenciel35th": {
+  "name": "[1122]LArc-en-Ciel 35th",
+  "g": null,
+  "checked": "20261120"
+ },
+ "1123昼ensemblestarscast": {
+  "name": "[1123・昼]Ensemble Stars!! Cast",
+  "g": null,
+  "checked": "20261120"
+ },
+ "btsworldtourariranginkaohsiungライブビューイング": {
+  "name": "BTS WORLD TOUR ARIRANG IN KAOHSIUNG ライブビューイング",
+  "g": "その他",
+  "by": "name",
+  "checked": "20261120"
+ },
+ "宝塚歌劇花組宝塚大劇場公演エリザベート愛と死の輪舞ロンド千秋楽ライブ中継": {
+  "name": "宝塚歌劇 花組宝塚大劇場公演『エリザベート-愛と死の輪舞(ロンド)-』千秋楽 ライブ中継",
+  "g": "その他",
+  "by": "name",
+  "checked": "20261120"
  }
 }
