@@ -182,5 +182,41 @@
   "g": "その他",
   "by": "name",
   "checked": "20261120"
+ },
+ "ボヘミアンラプソディ": {
+  "name": "ボヘミアン・ラプソディ",
+  "g": "洋画",
+  "tmdb": 424694,
+  "title": "ボヘミアン・ラプソディ",
+  "q": "ボヘミアン・ラプソディ",
+  "by": "tmdb",
+  "checked": "20261121"
+ },
+ "larcenciel35thlanniversarytour愛知公演ライブビューイング": {
+  "name": "L’Arc-en-Ciel “35th L’Anniversary TOUR” 愛知公演 ライブビューイング",
+  "g": "その他",
+  "by": "name",
+  "checked": "20261121"
+ },
+ "day2ensemblestarscastlivestarrysymphonysuperbloomintheater": {
+  "name": "【Day2】Ensemble Stars!! Cast Live Starry Symphony -Superbloom- in THEATER",
+  "g": "その他",
+  "by": "name",
+  "checked": "20261121"
+ },
+ "ensemblestarscastlivestarrysymphonysuperbloomintheater": {
+  "name": "Ensemble Stars!! Cast Live Starry Symphony -Superbloom- in THEATER",
+  "g": "その他",
+  "by": "name",
+  "checked": "20261121"
+ },
+ "クイーンブダペスト": {
+  "name": "クイーン:ブダペスト",
+  "g": "洋画",
+  "tmdb": 142773,
+  "title": "クイーン：ブダペスト",
+  "q": "クイーン:ブダペスト",
+  "by": "tmdb",
+  "checked": "20261121"
  }
 }
