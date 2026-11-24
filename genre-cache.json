@@ -343,5 +343,47 @@
   "q": "君の話",
   "by": "tmdb",
   "checked": "20261124"
+ },
+ "juicejuiceroomtour20265rooms": {
+  "name": "Juice=Juice Room Tour 2026 5ROOMS",
+  "g": "洋画",
+  "tmdb": 511901,
+  "title": "Juice",
+  "q": "Juice=Juice",
+  "by": "tmdb",
+  "checked": "20261124"
+ },
+ "プラクティカルマジック魔女たちの秘密": {
+  "name": "プラクティカル・マジック/魔女たちの秘密",
+  "g": "洋画",
+  "tmdb": 6435,
+  "title": "プラクティカル・マジック",
+  "q": "プラクティカル・マジック",
+  "by": "tmdb",
+  "checked": "20261124"
+ },
+ "duneデューン砂の惑星": {
+  "name": "DUNE/デューン 砂の惑星",
+  "g": "洋画",
+  "tmdb": 438631,
+  "title": "DUNE／デューン 砂の惑星",
+  "q": "DUNE/デューン 砂の惑星",
+  "by": "tmdb",
+  "checked": "20261124"
+ },
+ "デューン砂の惑星part2": {
+  "name": "デューン 砂の惑星 PART2",
+  "g": "洋画",
+  "tmdb": 693134,
+  "title": "デューン 砂の惑星PART2",
+  "q": "デューン 砂の惑星 PART2",
+  "by": "tmdb",
+  "checked": "20261124"
+ },
+ "juicejuiceroomtour20265roomsroyalsuiteライブビューイング": {
+  "name": "Juice=Juice Room Tour 2026「5ROOMS -ROYAL SUITE-」ライブビューイング",
+  "g": "その他",
+  "by": "name",
+  "checked": "20261124"
  }
 }
