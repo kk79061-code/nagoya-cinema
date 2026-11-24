@@ -385,5 +385,55 @@
   "g": "その他",
   "by": "name",
   "checked": "20261124"
+ },
+ "三代目jsoulbrothers15th": {
+  "name": "三代目 J SOUL BROTHERS 15TH",
+  "g": "邦画",
+  "tmdb": 1807509,
+  "title": "三代目 J SOUL BROTHERS 15TH ANNIVERSARY STADIUM LIVE  \"JSB FOREVER ～ONE～\" THE MOVIE",
+  "q": "三代目 J SOUL BROTHERS 15TH",
+  "by": "tmdb",
+  "checked": "20261125"
+ },
+ "三代目jsoulbrothers": {
+  "name": "三代目 J SOUL BROTHERS",
+  "g": "邦画",
+  "tmdb": 1807509,
+  "title": "三代目 J SOUL BROTHERS 15TH ANNIVERSARY STADIUM LIVE  \"JSB FOREVER ～ONE～\" THE MOVIE",
+  "q": "三代目 J SOUL BROTHERS",
+  "by": "tmdb",
+  "checked": "20261125"
+ },
+ "恋傷": {
+  "name": "恋傷",
+  "g": "邦画",
+  "tmdb": 1807541,
+  "title": "恋傷",
+  "q": "恋傷",
+  "by": "tmdb",
+  "checked": "20261125"
+ },
+ "1128佐野元春フルーツパンチ劇場": {
+  "name": "[1128]佐野元春「フルーツ・パンチ」劇場",
+  "g": null,
+  "checked": "20261125"
+ },
+ "栄光のバックホーム奇跡から栄光へ特別上映": {
+  "name": "栄光のバックホーム ~奇跡から栄光へ~特別上映",
+  "g": "邦画",
+  "tmdb": 1548626,
+  "title": "栄光のバックホーム",
+  "q": "栄光のバックホ",
+  "by": "tmdb",
+  "checked": "20261125"
+ },
+ "彼女にあったらよろしくと中部プレミア記念": {
+  "name": "映画『彼女にあったら、よろしくと』中部プレミア 記念",
+  "g": "邦画",
+  "tmdb": 1827408,
+  "title": "彼女にあったら、よろしくと",
+  "q": "彼女にあったら、よろしくと",
+  "by": "tmdb",
+  "checked": "20261125"
  }
 }
