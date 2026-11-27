@@ -512,5 +512,24 @@
   "q": "Yuzuru Hanyu “REALIVE” an ICE STORY project 佐賀公演",
   "by": "tmdb",
   "checked": "20261127"
+ },
+ "1128昼ensemblestarscast": {
+  "name": "[1128・昼]Ensemble Stars!! Cast",
+  "g": null,
+  "checked": "20261128"
+ },
+ "1128larcenciel35th": {
+  "name": "[1128]LArc-en-Ciel 35th",
+  "g": null,
+  "checked": "20261128"
+ },
+ "ヒプノシスマイクdivisionrapbattle": {
+  "name": "ヒプノシスマイク Division Rap Battle",
+  "g": "アニメ",
+  "tmdb": 1412811,
+  "title": "ヒプノシスマイク -Division Rap Battle-",
+  "q": "ヒプノシスマイク Division Rap Battle",
+  "by": "tmdb",
+  "checked": "20261128"
  }
 }
