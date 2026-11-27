@@ -476,5 +476,41 @@
   "q": "三代目 J SOUL",
   "by": "tmdb",
   "checked": "20261127"
+ },
+ "larcenciel35thlanniversarytourlv": {
+  "name": "L′Arc-en-Ciel “35th L′Anniversary TOUR” LV",
+  "g": "洋画",
+  "tmdb": 785556,
+  "title": "L'arc-en-ciel",
+  "q": "L′Arc",
+  "by": "tmdb",
+  "checked": "20261127"
+ },
+ "day3ensemblestarscastlivestarrysymphonysuperbloomintheater": {
+  "name": "【Day3】Ensemble Stars!! Cast Live Starry Symphony-Superbloom- in THEATER",
+  "g": "その他",
+  "by": "name",
+  "checked": "20261127"
+ },
+ "lvlarcenciel35thlanniversarytour神奈川公演ライブビューイング": {
+  "name": "LV)L’Arc-en-Ciel “35th L’Anniversary TOUR” 神奈川公演 ライブビューイング",
+  "g": "その他",
+  "by": "name",
+  "checked": "20261127"
+ },
+ "yuzuruhanyurealiveanicestoryproject佐賀公演ライブビューイング": {
+  "name": "「Yuzuru Hanyu “REALIVE” an ICE STORY project」 佐賀公演ライブ・ビューイング",
+  "g": "その他",
+  "by": "name",
+  "checked": "20261127"
+ },
+ "yuzuruhanyurealiveanicestoryproject佐賀公演": {
+  "name": "Yuzuru Hanyu “REALIVE” an ICE STORY project 佐賀公演",
+  "g": "邦画",
+  "tmdb": 1657035,
+  "title": "Yuzuru Hanyu “REALIVE” an ICE STORY project",
+  "q": "Yuzuru Hanyu “REALIVE” an ICE STORY project 佐賀公演",
+  "by": "tmdb",
+  "checked": "20261127"
  }
 }
